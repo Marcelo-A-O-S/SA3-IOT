@@ -2,6 +2,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <HTTPClient.h>
 
+
 class MonitorTemHum
 {
 private:
@@ -10,36 +11,25 @@ private:
     int pinLCDSCL;
     int pinoutTemp;
     int pinoutHum;
+    int pinSensor;
     float temperatura;
-    float humidade;
+    float umidade;
 public:
     LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 24, 4);
     DHTesp sensor;
     MonitorTemHum();
+    void setPinSensor(int pin);
     void setPinOutTemp(int pin);
     void setPinOutHum(int pin);
     void setPortSDALCD(int pin);
     void setPortSLCLCD(int pin);
-    void avaliableTempAndHum();
-    void setupSensor(int pin, DHTesp::DHT_MODEL_t model);
-    void initLCD();
-
+    String avaliableTempAndHum();
+    void Monitorinit();
+    void sendValues();
 };
+
 MonitorTemHum::MonitorTemHum()
 {
-}
-void MonitorTemHum::setPortSDALCD(int pin){
-  this->pinLCDSDA = pin;
-}
-void MonitorTemHum::setPortSLCLCD(int pin){
-  this->pinLCDSCL = pin;
-}
-void MonitorTemHum::initLCD(){
-  this->lcd.init(this->pinLCDSDA, this->pinLCDSCL);
-}
-void MonitorTemHum::setupSensor(int pin, DHTesp::DHT_MODEL_t model){
-  this->sensor.setup(pin,model);
-  pinMode(pin,INPUT);
 }
 void MonitorTemHum::setPinOutTemp(int pin){
     this->pinoutTemp = pin;
@@ -49,26 +39,52 @@ void MonitorTemHum::setPinOutHum(int pin){
     this->pinoutHum = pin;
     pinMode(this->pinoutHum,OUTPUT);
 }
-void MonitorTemHum::avaliableTempAndHum(){
+void MonitorTemHum::setPinSensor(int pin){
+    this->pinSensor = pin;
+    pinMode(pinSensor,INPUT);
+}
+void MonitorTemHum::setPortSDALCD(int pin){
+  this->pinLCDSDA = pin;
+}
+void MonitorTemHum::setPortSLCLCD(int pin){
+  this->pinLCDSCL = pin;
+}
+void MonitorTemHum::Monitorinit(){
+  this->lcd.init(this->pinLCDSDA, this->pinLCDSCL);
+  this->sensor.setup(pinSensor,this->sensor.DHT22);
+}
+void MonitorTemHum::sendValues(){
+    String url = "https://api.thingspeak.com/update?api_key=ALWFZTNL7L1FOI9Y&field1="+ String(this->temperatura) +"&field2="+ String(this->umidade);
+    this->http.begin(url);
+    int responsecode = this->http.GET();
+    if(responsecode == 200){
+      Serial.println("Valores atualizados com sucesso!");
+    }else{
+      Serial.println("Erro ocorrido na atualização dos Valores");
+    }
+    this->http.end();
+}
+String MonitorTemHum::avaliableTempAndHum(){
     this->temperatura = this->sensor.getTemperature();
-    this->humidade = this->sensor.getHumidity();
-    if(this->humidade >= 70.00f && this->temperatura < 30.00f){
+    this->umidade = this->sensor.getHumidity();
+    this->sendValues();
+    if(this->umidade >= 70.00f && this->temperatura < 30.00f){
       digitalWrite(this->pinoutHum,HIGH);
       digitalWrite(this->pinoutTemp,LOW);
       this->lcd.clear();
       this->lcd.println("Humidade alta!");
       this->lcd.setCursor(0,1);
       this->lcd.print("A Hum é:");
-      this->lcd.println(this->humidade);
-    }else if(this->humidade < 70.00f && this->temperatura >=  30.00f){
+      this->lcd.println(this->umidade);
+    }else if(this->umidade < 70.00f && this->temperatura >=  30.00f){
       digitalWrite(this->pinoutTemp,HIGH);
-      digitalWrite(this->pinoutTemp,LOW);
+      digitalWrite(this->pinoutHum,LOW);
       this->lcd.clear();
       this->lcd.println("Temperatura alta!");
       this->lcd.setCursor(0,1);
       this->lcd.print("A temp é:");
       this->lcd.println(this->temperatura);
-    }else if(this->humidade >= 70.00f && this->temperatura >=  30.00f){
+    }else if(this->umidade >= 70.00f && this->temperatura >=  30.00f){
       digitalWrite(this->pinoutTemp,HIGH);
       digitalWrite(this->pinoutHum,HIGH);
       this->lcd.clear();
@@ -81,8 +97,10 @@ void MonitorTemHum::avaliableTempAndHum(){
       this->lcd.println(this->temperatura);
       this->lcd.setCursor(0,1);
       this->lcd.println("Hum:");
-      this->lcd.println(this->humidade);
+      this->lcd.println(this->umidade);
       digitalWrite(this->pinoutTemp,LOW);
       digitalWrite(this->pinoutHum,LOW);
     }
+    String payload = "{\"temperatura\":"+ String(this->temperatura) +",\"umidade\": "+ String(this->umidade) +" }";
+    return payload;
 }
