@@ -11,17 +11,19 @@ private:
     WiFiClient wificlient;
     String clientID;
 public:
-    PubSubClient *client;
+    PubSubClient *client = new PubSubClient(this->wificlient);
     MQTT();
     void setStringServer(char *_server);
     void setClient();
     void setPort(int _port);
     void setTopic(char * _topic);
     void init();
-    void reconnect();
     void connect();
     void Publish(String payload);
 };
+void callback(char* topic, byte* payload, unsigned int length) {
+  // handle message arrived
+}
 MQTT::MQTT()
 {
 }
@@ -45,15 +47,11 @@ void MQTT::setTopic(char * _topic){
 void MQTT::init(){
     //Iniciando a comunicação
     this->client->setServer(this->server, this->port);
+    this->client->setCallback(callback);
 }
-void MQTT::reconnect(){
-    while(!this->client->connected()){
-        Serial.println("Reconectando ao Broker");
-        this->connect();
-    }
-    Serial.println("Conexão feita com sucesso!");
-}
+
 void MQTT::connect(){
+    //Conectando ao servideor broker
     while(!this->client->connected()){
         Serial.println("Conectando ao Broker....");
         this->clientID = "ClientID-";

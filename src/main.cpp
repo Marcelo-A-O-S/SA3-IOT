@@ -5,11 +5,15 @@
 WifiWokwi *wifi = new WifiWokwi();
 MonitorTemHum *monitor = new MonitorTemHum();
 MQTT *mqtt = new MQTT();
+boolean result;
 void setup(){
     wifi->setSSiD("Wokwi-GUEST");
     wifi->setPassword("");
-    wifi->setChannel(6);
-    wifi->init();
+    //wifi->setChannel();
+    result = wifi->init();
+    if(result == false){
+        Serial.println("Problema de conexão wifi");
+    }
     mqtt->setClient();
     mqtt->setStringServer("mqtt-dashboard.com");
     mqtt->setPort(8884);
