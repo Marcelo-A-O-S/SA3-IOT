@@ -51,19 +51,23 @@ void MQTT::init(){
 }
 
 void MQTT::connect(){
-    //Conectando ao servideor broker
+    //Conectando ao servideor broker caso ainda não esteja conectado
     while(!this->client->connected()){
         Serial.println("Conectando ao Broker....");
         this->clientID = "ClientID-";
         this->clientID += String(random(0xffff), HEX);
+        //Conectando a um broker passando a Clientid
         if(this->client->connect(this->clientID.c_str())){
+            //Caso tenha sucesso
             Serial.println("Conectado");
         }else{
+            //Caso ocorra falha na conexão
             Serial.println("Problema de conexão");
             Serial.println(this->client->state());
         }
     }
 }
 void MQTT::Publish(String payload){
+    //Publicando dados
     this->client->publish(this->topic, payload.c_str());
 }
