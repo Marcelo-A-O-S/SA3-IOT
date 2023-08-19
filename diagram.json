@@ -1,0 +1,58 @@
+{
+    "version": 1,
+    "author": "Marcelo Augusto",
+    "editor": "wokwi",
+    "parts": [
+        {
+          "type": "wokwi-esp32-devkit-v1",
+          "id": "esp",
+          "top": -4.01,
+          "left": -153.33,
+          "attrs": { "color": "blue" }
+        },
+        {
+          "type": "wokwi-led",
+          "id": "led1",
+          "top": 34.23,
+          "left": 59.33,
+          "attrs": { "color": "red" }
+        },
+        {
+          "type": "wokwi-dht22",
+          "id": "dht1",
+          "top": -119.03,
+          "left": -278.33,
+          "attrs": { "temperature": "23.7" }
+        },
+        {
+          "type": "wokwi-lcd1602",
+          "id": "lcd1",
+          "top": -169.88,
+          "left": -145.59,
+          "attrs": { "pins": "i2c" ,"background": "blue", "color": "white"}
+        },
+        {
+          "type": "wokwi-led",
+          "id": "led2",
+          "top": 159.04,
+          "left": 65.05,
+          "rotate": 180,
+          "attrs": { "color": "red" }
+        }
+      ],
+      "connections": [
+        [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+        [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+        [ "led1:A", "esp:D12", "red", [ "v0" ] ],
+        [ "led1:C", "esp:GND.2", "black", [ "v66.54", "h1.94" ] ],
+        [ "dht1:GND", "esp:GND.1", "black", [ "v20.35", "h71.45", "v-36.59", "h133.33", "v164.4" ] ],
+        [ "dht1:SDA", "esp:D14", "gold", [ "v0" ] ],
+        [ "dht1:VCC", "esp:VIN", "red", [ "v0" ] ],
+        [ "led2:C", "esp:GND.1", "black", [ "v0" ] ],
+        [ "led2:A", "esp:D2", "red", [ "v0" ] ],
+        [ "lcd1:GND", "esp:GND.1", "black", [ "h292.45", "v287.3" ] ],
+        [ "lcd1:VCC", "esp:3V3", "red", [ "h-22.65", "v-76.09", "h362.12", "v371.53" ] ],
+        [ "lcd1:SDA", "esp:D21", "gold", [ "h-29.7", "v90.77", "h170.48", "v84.65" ] ],
+        [ "lcd1:SCL", "esp:D22", "blue", [ "h-17.94", "v67.16", "h189.29", "v68.19" ] ]
+      ]
+}
