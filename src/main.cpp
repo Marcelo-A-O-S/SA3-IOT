@@ -27,9 +27,6 @@ void setup(){
 void loop() {
     if(wifi->verifyConnectionWifi()){
         String payload = monitor->avaliableTempAndHum();
-        if(!mqtt->client->connected()){
-            mqtt->connect();
-        }
         mqtt->Publish(payload);
         mqtt->client->loop();
     }else{

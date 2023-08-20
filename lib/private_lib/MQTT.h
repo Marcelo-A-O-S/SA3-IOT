@@ -5,9 +5,9 @@
 class MQTT
 {
 private:
-    char *server;
+    String server;
     int port;
-    char *topic;
+    String topic;
     WiFiClient wificlient;
     String clientID;
 public:
@@ -30,7 +30,7 @@ MQTT::MQTT()
 
 void MQTT::setStringServer(char *_server){
     //Inserindo o dominio do servidor para utilizar para conexão posteriormente
-    this->server = _server;
+    this->server = String(_server);
 }
 void MQTT::setClient(){
     //Instanciando a classe para conectar ao servidor mqtt
@@ -43,7 +43,7 @@ void MQTT::setPort(int _port){
 }
 void MQTT::setTopic(char * _topic){
     //Inserindo o topico
-    this->topic = _topic;
+    this->topic = String(_topic);
 }
 void MQTT::init(){
     if(!this->server){
@@ -57,7 +57,7 @@ void MQTT::init(){
         }
     }
     //Iniciando a comunicação
-    this->client->setServer(this->server, this->port);
+    this->client->setServer(this->server.c_str(), this->port);
     this->client->setCallback(callback);
 }
 
@@ -80,8 +80,11 @@ void MQTT::connect(){
 }
 void MQTT::Publish(String payload){
     //Publicando dados
+    if(!this->client->connected()){
+        this->connect();
+    }
     Serial.println(payload.c_str());
-    boolean retorno = this->client->publish(this->topic, payload.c_str());
+    boolean retorno = this->client->publish(this->topic.c_str(), payload.c_str());
     if(retorno == false){
         Serial.println("Erro ao enviar payload de informações");
     }else{

@@ -87,6 +87,8 @@ void MonitorTemHum::sendValues(){
       //Serial.println("Valores atualizados com sucesso!");
     }else{
       Serial.println("Erro ocorrido na atualização dos Valores");
+      Serial.print("Status Code: ");
+      Serial.println(responsecode);
     }
     this->http.end();
 }

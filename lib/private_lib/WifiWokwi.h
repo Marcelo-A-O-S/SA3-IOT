@@ -48,7 +48,7 @@ void WifiWokwi::init()
 {
     //Iniciando a conexão serial
     Serial.begin(9600);
-    Serial.println("Connecting to WiFi");
+    Serial.println("Conectando o wifi!");
     //Condição caso o canal não seja informado
     if(!this->channel){
         Serial.println("Informações do canal do Getway não informadas!");
@@ -58,8 +58,8 @@ void WifiWokwi::init()
             delay(100);
             Serial.print(".");
         }
-        Serial.println(" Connected!");
-        Serial.print("IP address: ");
+        Serial.println(" Conectado!");
+        Serial.print("Endereço IP: ");
         Serial.println(wifi.localIP());
 
     //Condição caso o SSID não seja informado
@@ -81,8 +81,8 @@ void WifiWokwi::init()
             delay(100);
             Serial.print(".");
         }
-        Serial.println(" Connected!");
-        Serial.print("IP address: ");
+        Serial.println(" Conectado!");
+        Serial.print("Endereço IP: ");
         Serial.println(WiFi.localIP());
     }
 
