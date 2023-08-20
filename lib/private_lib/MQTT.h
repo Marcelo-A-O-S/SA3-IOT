@@ -11,7 +11,7 @@ private:
     WiFiClient wificlient;
     String clientID;
 public:
-    PubSubClient *client = new PubSubClient(this->wificlient);
+    PubSubClient *client;
     MQTT();
     void setStringServer(char *_server);
     void setClient();
@@ -34,6 +34,7 @@ void MQTT::setStringServer(char *_server){
 }
 void MQTT::setClient(){
     //Instanciando a classe para conectar ao servidor mqtt
+    Serial.println("Iniciando configuração do cliente");
     this->client = new PubSubClient(this->wificlient);
 }
 void MQTT::setPort(int _port){
@@ -45,6 +46,16 @@ void MQTT::setTopic(char * _topic){
     this->topic = _topic;
 }
 void MQTT::init(){
+    if(!this->server){
+        while(!this->server){
+            Serial.println("O Servidor não foi informado para conexão MQTT");
+        }
+    }
+    if(!this->port){
+        while(!this->port){
+            Serial.println("A Porta não foi informada para conexão MQTT");
+        }
+    }
     //Iniciando a comunicação
     this->client->setServer(this->server, this->port);
     this->client->setCallback(callback);
@@ -69,5 +80,11 @@ void MQTT::connect(){
 }
 void MQTT::Publish(String payload){
     //Publicando dados
-    this->client->publish(this->topic, payload.c_str());
+    Serial.println(payload.c_str());
+    boolean retorno = this->client->publish(this->topic, payload.c_str());
+    if(retorno == false){
+        Serial.println("Erro ao enviar payload de informações");
+    }else{
+        Serial.println("Informações enviadas com sucesso!");
+    }
 }

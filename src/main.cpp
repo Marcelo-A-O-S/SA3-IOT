@@ -5,18 +5,15 @@
 WifiWokwi *wifi = new WifiWokwi();
 MonitorTemHum *monitor = new MonitorTemHum();
 MQTT *mqtt = new MQTT();
-boolean result;
+
 void setup(){
     wifi->setSSiD("Wokwi-GUEST");
     wifi->setPassword("");
-    result = wifi->init();
-    if(result == false){
-        Serial.println("Problema de conexão wifi");
-    }
-    mqtt->setClient();
+    wifi->init();
     mqtt->setStringServer("mqtt-dashboard.com");
-    mqtt->setPort(8884);
+    mqtt->setPort(1883);
     mqtt->setTopic("Teste-tdes");
+    mqtt->setClient();
     mqtt->init();
     mqtt->connect();
     monitor->setPortSDALCD(21);
@@ -28,10 +25,17 @@ void setup(){
 
 }
 void loop() {
-    String payload = monitor->avaliableTempAndHum();
-    if(!mqtt->client->connected()){
-        mqtt->connect();
+    if(wifi->verifyConnectionWifi()){
+        String payload = monitor->avaliableTempAndHum();
+        if(!mqtt->client->connected()){
+            mqtt->connect();
+        }
+        mqtt->Publish(payload);
+        mqtt->client->loop();
+    }else{
+        Serial.println("Fazendo a reconexão do wifi!");
+        wifi->init();
     }
-    mqtt->Publish(payload);
+    //mqtt->client->loop();
     delay(1000);
 }

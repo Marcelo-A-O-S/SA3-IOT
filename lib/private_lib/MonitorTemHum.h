@@ -55,10 +55,25 @@ void MonitorTemHum::setPortSLCLCD(int pin){
   this->pinLCDSCL = pin;
 }
 void MonitorTemHum::Monitorinit(){
-  //Iniciando o lcd
+  //Validando se as informações dos pinos do lcd foram informadas
+  if(!this->pinLCDSDA || !this->pinLCDSCL){
+    while(!this->pinLCDSDA || !this->pinLCDSCL){
+      Serial.println("Informções dos pinos SDA e SCL do lcd não foram passadas!");
+    }
+  }
+  //Validando se a informação do pino SDA do sensor foi passada
+  if(!this->pinSensor){
+    while(!this->pinSensor){
+      Serial.println("Informações do pino SDA do sensor DHT não informadas");
+    }
+  }
+  //Iniciando a configuração lcd
+  Serial.println("Iniciando a configuração lcd");
   this->lcd.init(this->pinLCDSDA, this->pinLCDSCL);
-  //Iniciando o Sensor
-  this->sensor.setup(pinSensor,this->sensor.DHT22);
+  //Iniciando a configuração do Sensor
+  Serial.println("Iniciando a configuração do Sensor");
+  this->sensor.setup(this->pinSensor,this->sensor.DHT22);
+  Serial.println("O lcd e o sensor foram configurados!");
 }
 void MonitorTemHum::sendValues(){
   //url para requisição get na api do thingspeak
@@ -69,7 +84,7 @@ void MonitorTemHum::sendValues(){
     int responsecode = this->http.GET();
     //Caso retorne 200 que é um status code que confirma exito, ele exibe o que está no primeiro bloco, senão, o segundo
     if(responsecode == 200){
-      Serial.println("Valores atualizados com sucesso!");
+      //Serial.println("Valores atualizados com sucesso!");
     }else{
       Serial.println("Erro ocorrido na atualização dos Valores");
     }
